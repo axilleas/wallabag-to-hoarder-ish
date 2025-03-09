@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 require 'json'
 require 'time'
-require 'sanitize'
 
 abort "Usage: ./script import-file [export-file]" if ARGV.empty?
 
@@ -11,8 +10,7 @@ export_filename = 'exported_bookmarks.html' if export_filename.empty? || export_
 
 loaded_file = JSON.load(File.open(input_file))
 
-output_begin = '''
-<!DOCTYPE NETSCAPE-Bookmark-file-1>
+output_begin = '''<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
 <TITLE>Bookmarks</TITLE>
 <H1>Bookmarks</H1>
@@ -26,8 +24,6 @@ output = output_begin
 for item in loaded_file do
   article = "<DT><A HREF=\"#{item['url']}\" ADD_DATE=\"#{Time.parse(item['created_at']).to_i}\" LAST_MODIFIED=\"#{Time.parse(item['updated_at']).to_i}\" TAGS=\"#{item['tags'].join(',')}\">#{item['title']}</A>\n"
   output << article
-  article_content = "<DD>#{Sanitize.clean(item['content']).to_s[/^.{150}\s/]}\n"
-  output << article_content
 end
 
 output << output_end
